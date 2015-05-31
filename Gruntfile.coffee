@@ -26,8 +26,8 @@ module.exports = (grunt)->
         ]
 
       min:
-        dstPath: 'build/CalculatedCachedProperties-min'
-        optimize: true # 'uglify2'
+#        dstPath: 'build/CalculatedCachedProperties-min'
+#        optimize: true # 'uglify2'
         rjs: preserveLicenseComments: false
         resources: [
           [ '+remove:debug', [/./]

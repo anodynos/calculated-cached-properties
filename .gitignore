@@ -1,6 +1,7 @@
 /.idea/
 /node_modules/
 /build/
+/DRAFT/
 /bower_components/
 /draft/
 .urequire-local-deps-cache.json

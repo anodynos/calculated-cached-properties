@@ -66,7 +66,8 @@ define ->
 
     defineCalcProperties: (isOverwrite)->
       Object.defineProperty @, cacheKey, value: {}, enumerable: false, configurable: false, writeable: false
-      for cPropName, cPropFn of @allCalcProperties
+
+      for cPropName, cPropFn of @allCalcProperties or @getAllCalcProperties()
         @[cacheKey][cPropName] = cUndefined
         if not @constructor::hasOwnProperty(cPropName) or isOverwrite
           do (cPropName, cPropFn)=>
@@ -88,11 +89,11 @@ define ->
     # or cleanProps() to clear them all
     # undefined args are ignored
     cleanProps: (cleanArgs...)->
-      cleanArgs = _.keys(@allCalcProperties) if _.isEmpty cleanArgs
+      cleanArgs = _.keys(@allCalcProperties or @getAllCalcProperties()) if _.isEmpty cleanArgs
       cleaned = []
       for ca in cleanArgs when ca
         if _.isFunction ca
-          propKeys = _.keys @allCalcProperties if not propKeys # `propKeys or=` can't be assigned with ||= because it has not been declared before
+          propKeys = _.keys(@allCalcProperties or @getAllCalcProperties()) if not propKeys # `propKeys or=` can't be assigned with ||= because it has not been declared before
           for p in propKeys when ca(p)
             if @[cacheKey][p] isnt cUndefined
               l.deb "...delete (via fn) value of property #{@constructor.name}.#{p}"

@@ -22,12 +22,12 @@ module.exports = (grunt)->
       dev:
         dependencies: imports: uberscore: '_B'
         resources: [
-          [ '+add:Logger', [/./], (m)-> m.beforeBody = "var l = new _B.Logger();"]
+          [ '+add:Logger', [/./], (m)-> m.beforeBody = "var l = new _B.Logger('CCP', 100);"]
         ]
 
       min:
 #        dstPath: 'build/CalculatedCachedProperties-min'
-#        optimize: true # 'uglify2'
+        optimize: true # 'uglify2'
         rjs: preserveLicenseComments: false
         resources: [
           [ '+remove:debug', [/./]

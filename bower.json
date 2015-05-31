@@ -1,0 +1,29 @@
+{
+  "name": "calculated-cached-properties",
+  "version": "0.0.1",
+  "main": [
+    "build/calculated-cached-properties-dev.js",
+    "build/calculated-cached-properties-min.js"
+  ],
+  "ignore": [
+    "source",
+    "Gruntfile.coffee",
+    "node_modules",
+    "bower_components",
+    "source/spec/*.*",
+    "source/examples/*.*",
+    "draft/*",
+    "build/spec",
+    ".gitignore",
+    ".npmignore",
+    "travis.yml"
+  ],
+  "dependencies": {
+    "lodash": "*",
+    "uberscore": "~0.0.16"
+  },
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*"
+  }
+}

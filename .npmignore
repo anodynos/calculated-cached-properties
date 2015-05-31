@@ -1,0 +1,13 @@
+/.idea/
+/node_modules/
+/bower_components/
+/source/
+/build/AMDunderscore
+/build/spec
+/build/spec_combined
+/build/nodejsCompileAndCopy
+/build/UMDplainReplaceDep
+/build/UMDunderscore
+/.npmignore
+/.gitignore
+.urequire-local-deps-cache.json

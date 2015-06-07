@@ -1,9 +1,9 @@
 {
   "name": "calculated-cached-properties",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": [
-    "build/calculated-cached-properties-dev.js",
-    "build/calculated-cached-properties-min.js"
+    "build/dev/calculated-cached-properties.js",
+    "build/min/calculated-cached-properties-min.js"
   ],
   "ignore": [
     "source",
@@ -19,11 +19,11 @@
     "travis.yml"
   ],
   "dependencies": {
-    "lodash": "*",
-    "uberscore": "~0.0.16"
+    "lodash": "*"
   },
   "devDependencies": {
     "chai": "*",
-    "mocha": "*"
+    "mocha": "*",
+    "uberscore": "~0.0.16"
   }
 }

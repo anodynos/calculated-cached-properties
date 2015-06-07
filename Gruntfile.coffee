@@ -13,26 +13,22 @@ module.exports = (grunt)->
       _defaults: # for lib
         main: 'CalculatedCachedProperties'
         path: 'source/code'
+        resources: [ 'inject-version' ]
         runtimeInfo: false
         noLoaderUMD: true
         warnNoLoaderUMD: false
-        resources: [ 'inject-version' ]
         template: name: 'UMDplain'
 
       dev:
         dstPath: 'build/dev'
-        dependencies: imports: uberscore: '_B'
-        resources: [
-          [ '+add:Logger', [/./], (m)-> m.beforeBody = "var l = new _B.Logger('CCP', 100);"]
-        ]
+        resources: [[ '+add:Logger', [/./], (m)-> m.beforeBody = "var l = console; l.deb = l.log" ]]
 
       min:
         dstPath: 'build/min'
         optimize: true # 'uglify2'
-        rjs: preserveLicenseComments: false
         resources: [
           [ '+remove:debug', [/./]
-            (m)-> m.replaceCode c for c in ['l.deb()', 'this.l.deb()', 'if (l.deb()){}', 'if (this.l.deb()){}']]
+            (m)-> m.replaceCode c for c in ['l.deb()', 'if (l.deb()){}' ]]
 
           ['%save with different name', ['CalculatedCachedProperties.js'],
            (m)->
@@ -72,12 +68,10 @@ module.exports = (grunt)->
         derive: ['spec']
         afterBuild: [[null], require('urequire-ab-specrunner').options
           injectCode: testNoConflict
-          mochaOptions: '-R spec'
+          mochaOptions: '-R dot'
           specRunners: ['mocha-cli']
           watch: 1439
         ]
-
-    clean: files: ['build']
 
   splitTasks = (tasks)-> if (tasks instanceof Array) then tasks else tasks.split(/\s/).filter((f)->!!f)
   grunt.registerTask shortCut, "urequire:#{shortCut}" for shortCut of gruntConfig.urequire

@@ -1,7 +1,7 @@
 {
   "name": "calculated-cached-properties",
   "description": "calculated-cached-properties, a spinoff of uBerscore library. Docs will follow.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "homepage": "https://github.com/anodynos/calculated-cached-properties",
   "author": {
     "name": "Agelos Pikoulas",

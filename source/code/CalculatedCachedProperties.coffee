@@ -12,6 +12,26 @@ define ->
     cUndefined = {'cUndefined':true} # allow undefined as a valid cached value - store this instead of deleting key
 
 
+    # register simple pojsos or constructor functions
+    @register: (pojsoOrConstructor, calcProperties)->
+      if _.isFunction pojsoOrConstructor
+        classConstructor = pojsoOrConstructor
+        _.extend classConstructor.prototype, CalculatedCachedProperties.prototype
+        _.extend (classConstructor.calcProperties or= {}), calcProperties
+        classConstructor.prototype.defineCalcProperties() # does not initialize the cache yet
+      else
+        pojso = pojsoOrConstructor
+        # TODO: check these are optimal & correct at all cases
+        _.extend pojso.__proto__ = {}, CalculatedCachedProperties.prototype
+        pojso.constructor = ctor = ->
+        ctor.prototype = pojso.__proto__
+        _.extend ctor.prototype, CalculatedCachedProperties.prototype
+        _.extend (ctor.calcProperties or= {}), calcProperties
+
+        pojso.defineCalcProperties()
+
+      pojsoOrConstructor
+
     # Gets all coffeescript classes (i.e constructors linked via __super__) of given obj, constructor or target instance.
     # If called on an instance without params, it gets all inherited classes for this instance (including its own class).
     #
@@ -28,10 +48,11 @@ define ->
     getClasses: (instOrClass, _classes=[])->
       instOrClass = @ if not instOrClass
 
-      if (typeof instOrClass) isnt 'function'
+      if not _.isFunction instOrClass
         instOrClass = instOrClass.constructor
 
       _classes.unshift instOrClass
+
       if instOrClass.__super__
         @getClasses instOrClass.__super__.constructor, _classes
       else
@@ -52,6 +73,7 @@ define ->
     @getAllCalcProperties: @::getAllCalcProperties
 
     Object.defineProperties @::,
+
       allCalcProperties: get:->
         if not @constructor::hasOwnProperty '_allCalcProperties' # use cached result, shared by all instances
           Object.defineProperty @constructor::, '_allCalcProperties', value: @getAllCalcProperties(), enumerable: false
@@ -64,25 +86,41 @@ define ->
 
     constructor: -> @defineCalcProperties()
 
-    defineCalcProperties: (isOverwrite)->
-      Object.defineProperty @, cacheKey, value: {}, enumerable: false, configurable: false, writeable: false
+    ###
+    # Creates the cache {} held in `cacheKey` as a non enumerable field (i.e hidden)
+    # and initializes each property value to `cUndefined`
+    ###
+    initCache: ->
+      l.deb "Initializing cache for calculated properties of constructor named `#{@constructor.name}`"
+
+      # TODO: check if exists & just reset ?
+      Object.defineProperty @, cacheKey, value: {}, enumerable: true, configurable: false, writeable: false
 
       for cPropName, cPropFn of @allCalcProperties or @getAllCalcProperties()
         @[cacheKey][cPropName] = cUndefined
+
+      return
+
+    defineCalcProperties: (isOverwrite)->
+      for cPropName, cPropFn of @allCalcProperties or @getAllCalcProperties()
         if not @constructor::hasOwnProperty(cPropName) or isOverwrite
           do (cPropName, cPropFn)=>
+
             l.deb "...defining calculated property #{@constructor.name}.#{cPropName}"
             Object.defineProperty @constructor::, cPropName, # @todo: allow instance properties to be added dynamically
               enumerable: true
               configurable: true # @todo: check if its not same class and redefine ?
               get:->
+                @initCache() if not @[cacheKey] # make sure it runs on the instance
                 l.deb "...requesting calculated property #{@constructor.name}.#{cPropName}"
                 if @[cacheKey][cPropName] is cUndefined
                   l.deb "...refreshing calculated property #{@constructor.name}.#{cPropName}" # and cPropName isnt 'dstFilenames'
                   @[cacheKey][cPropName] = cPropFn.call @
                 @[cacheKey][cPropName]
 
-              set: (v)-> @[cacheKey][cPropName] = v
+              set: (v)->
+                @initCache() if not @[cacheKey] # make sure it runs on the instance
+                @[cacheKey][cPropName] = v
       null
 
     # use as cleanProps 'propName1', ((p)-> p is 'propName2'), undefined, 'propName3'

@@ -7,6 +7,7 @@ module.exports = (grunt)->
           paths: bower: true
           shim: true
         template: banner: true
+        clean: true
 #        debugLevel: 10
 
       _defaults: # for lib
@@ -16,22 +17,28 @@ module.exports = (grunt)->
         noLoaderUMD: true
         warnNoLoaderUMD: false
         resources: [ 'inject-version' ]
-        dstPath: 'build/code'
         template: name: 'UMDplain'
 
       dev:
+        dstPath: 'build/dev'
         dependencies: imports: uberscore: '_B'
         resources: [
           [ '+add:Logger', [/./], (m)-> m.beforeBody = "var l = new _B.Logger('CCP', 100);"]
         ]
 
       min:
-#        dstPath: 'build/CalculatedCachedProperties-min'
+        dstPath: 'build/min'
         optimize: true # 'uglify2'
         rjs: preserveLicenseComments: false
         resources: [
           [ '+remove:debug', [/./]
             (m)-> m.replaceCode c for c in ['l.deb()', 'this.l.deb()', 'if (l.deb()){}', 'if (this.l.deb()){}']]
+
+          ['%save with different name', ['CalculatedCachedProperties.js'],
+           (m)->
+              m.dstFilename = 'CalculatedCachedProperties-min.js' # save under this name
+              m.converted # return m.converted, leaving file content to be saved as is
+          ]
         ]
 
       spec:
@@ -65,7 +72,8 @@ module.exports = (grunt)->
         derive: ['spec']
         afterBuild: [[null], require('urequire-ab-specrunner').options
           injectCode: testNoConflict
-          mochaOptions: '-R dot'
+          mochaOptions: '-R spec'
+          specRunners: ['mocha-cli']
           watch: 1439
         ]
 
@@ -74,9 +82,9 @@ module.exports = (grunt)->
   splitTasks = (tasks)-> if (tasks instanceof Array) then tasks else tasks.split(/\s/).filter((f)->!!f)
   grunt.registerTask shortCut, "urequire:#{shortCut}" for shortCut of gruntConfig.urequire
   grunt.registerTask shortCut, splitTasks tasks for shortCut, tasks of {
-    default: 'clean dev spec' # always in pairs of `lib spec`
-    release: 'clean dev specDev min specDev'
-    develop: 'clean dev specWatch'
+    default: 'dev spec' # always in pairs of `lib spec`
+    release: 'dev specDev min specDev'
+    develop: 'dev specWatch'
   }
   grunt.loadNpmTasks task for task of grunt.file.readJSON('package.json').devDependencies when task.lastIndexOf('grunt-', 0) is 0
   grunt.initConfig gruntConfig

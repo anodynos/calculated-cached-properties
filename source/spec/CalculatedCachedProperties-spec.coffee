@@ -1,6 +1,6 @@
-describe "CCP:", ->
+describe "CalculatedCachedProperties:", ->
 
-  class CalculatedCachedProperties2 extends CCP
+  class CalculatedCachedProperties2 extends CalculatedCachedProperties
 
   class SelfishNumber extends CalculatedCachedProperties2
     constructor: ->
@@ -42,10 +42,10 @@ describe "CCP:", ->
 
     describe "called on target instance:", ->
       it "#1", ->
-        deepEqual dn.classes, [CCP, CalculatedCachedProperties2, SelfishNumber, DirtyNumbers ]
+        deepEqual dn.classes, [CalculatedCachedProperties, CalculatedCachedProperties2, SelfishNumber, DirtyNumbers ]
 
       it "#2", ->
-        deepEqual sn.classes, [CCP, CalculatedCachedProperties2, SelfishNumber]
+        deepEqual sn.classes, [CalculatedCachedProperties, CalculatedCachedProperties2, SelfishNumber]
 
     describe "Get all calculated properties, overriding properties in parent classes:", ->
 
@@ -73,11 +73,11 @@ describe "CCP:", ->
           it "#1", ->
             deepEqual DirtyNumbers.getAllCalcProperties(dn), allDnProperties
             deepEqual SelfishNumber.getAllCalcProperties(dn), allDnProperties
-            deepEqual CCP.getAllCalcProperties(dn), allDnProperties
+            deepEqual CalculatedCachedProperties.getAllCalcProperties(dn), allDnProperties
           it "#2", ->
             deepEqual DirtyNumbers.getAllCalcProperties(sn), SelfishNumber.calcProperties
             deepEqual SelfishNumber.getAllCalcProperties(sn), SelfishNumber.calcProperties
-            deepEqual CCP.getAllCalcProperties(sn), SelfishNumber.calcProperties
+            deepEqual CalculatedCachedProperties.getAllCalcProperties(sn), SelfishNumber.calcProperties
 
       describe "with class as param:", ->
 
@@ -85,35 +85,39 @@ describe "CCP:", ->
           it "#1", -> deepEqual sn.getAllCalcProperties(DirtyNumbers), allDnProperties
           it "#2", -> deepEqual dn.getAllCalcProperties(SelfishNumber), SelfishNumber.calcProperties
 
-        describe "called statically (on any class):", ->
-          it "#1", ->
-            deepEqual CCP.getAllCalcProperties(DirtyNumbers), allDnProperties
-            deepEqual SelfishNumber.getAllCalcProperties(DirtyNumbers), allDnProperties
-          it "#2", ->
-            deepEqual CCP.getAllCalcProperties(SelfishNumber), SelfishNumber.calcProperties
-            deepEqual DirtyNumbers.getAllCalcProperties(SelfishNumber), SelfishNumber.calcProperties
+      describe "called statically (on any class):", ->
+        it "#1", ->
+          deepEqual CalculatedCachedProperties.getAllCalcProperties(DirtyNumbers), allDnProperties
+          deepEqual SelfishNumber.getAllCalcProperties(DirtyNumbers), allDnProperties
+        it "#2", ->
+          deepEqual CalculatedCachedProperties.getAllCalcProperties(SelfishNumber), SelfishNumber.calcProperties
+          deepEqual DirtyNumbers.getAllCalcProperties(SelfishNumber), SelfishNumber.calcProperties
 
   describe "POJSO's prototype registering:", ->
     ObjectDotPrototype = _.clone Object.prototype, true
 
-    obj = CCP.register {
-      someProp: 5
-    }, someCalcProperty: -> {some: 'value' }
+    calcValue = { some: 'value' }
+
+    obj = CalculatedCachedProperties.register { someProp: 5 }, someCalcProperty: -> calcValue
 
     it "does not alter the Object prototype", ->
       deepEqual ObjectDotPrototype, Object.prototype
 
     it "alters the registered instance's prototype", ->
       notDeepEqual obj.__proto__, Object.prototype
-      like CCP::, obj.__proto__
+      like CalculatedCachedProperties::, obj.__proto__
       ok _.has obj.__proto__, 'someCalcProperty'
 
     it "instance is still an Object instance ", ->
       tru _.isObject obj
       tru _B.isHash obj
 
-      #tru _.isPlainObject obj # fails
-      #tru obj.constructor is Object # fails
+    it "calulated property has the correct value", ->
+      equal obj.someCalcProperty, calcValue
+
+    it.skip "object instance is correctly identified as such", ->
+      tru _.isPlainObject obj       # fails
+      tru obj.constructor is Object # fails
 
   describe "calculating & caching properties:", ->
 
@@ -125,27 +129,36 @@ describe "CCP:", ->
         setNums: (@x, @y)->
           @calcHits = {}
 
-    CCP.register DirtyNumbersJSConstructor, allDnProperties
+    CalculatedCachedProperties.register DirtyNumbersJSConstructor, allDnProperties
 
     for dirtyNums in [
         title: "Coffeescript class instances"
+
         dn: new DirtyNumbers 3, 4
+
         dn2: new DirtyNumbers 5, 6
+
         dn3: new DirtyNumbers 1001
       ,
         title: "Javascript instances (via constructor function)"
+
         dn: new DirtyNumbersJSConstructor 3, 4
+
         dn2: new DirtyNumbersJSConstructor 5, 6
+
         dn3: new DirtyNumbersJSConstructor 1001
       ,
         title: "POJSO instances"
-        dn: (CCP.register {
+
+        dn: (CalculatedCachedProperties.register {
           setNums: (@x, @y)-> @calcHits = {}; @
         }, allDnProperties).setNums 3, 4
-        dn2: (CCP.register {
+
+        dn2: (CalculatedCachedProperties.register {
           setNums: (@x, @y)-> @calcHits = {}; @
         }, allDnProperties).setNums 5, 6
-        dn3: (CCP.register {
+
+        dn3: (CalculatedCachedProperties.register {
           setNums: (@x, @y)-> @calcHits = {}; @
         }, allDnProperties).setNums 1001
     ]
@@ -183,7 +196,7 @@ describe "CCP:", ->
         describe "remembers cached result, without calculating", ->
 
           it "#1", ->
-            dn.x = 5; dn.y = 4;
+            dn.x = 55; dn.y = 44;
             equal dn.added, 7
             equal dn.added, 7
             equal dn.calcHits.added, 1
@@ -193,7 +206,7 @@ describe "CCP:", ->
             equal dn.calcHits.multiplied, 1
 
           it "#2", ->
-            dn2.x = 2; dn2.y = 3;
+            dn2.x = 22; dn2.y = 33;
             equal dn2.added, 11
             equal dn2.added, 11
             equal dn2.calcHits.added, 1
@@ -202,9 +215,34 @@ describe "CCP:", ->
             equal dn2.multiplied, 30
             equal dn2.calcHits.multiplied, 1
 
+        describe "setting value of property manually becomes the cached result", ->
+
+          it "#1", ->
+            dn.added = 333
+            equal dn.added, 333
+            equal dn.added, 333
+            equal dn.calcHits.added, 1
+
+            dn.multiplied = 555
+            equal dn.multiplied, 555
+            equal dn.multiplied, 555
+            equal dn.calcHits.multiplied, 1
+
+          it "#2", ->
+            dn2.added = 444
+            equal dn2.added, 444
+            equal dn2.added, 444
+            equal dn2.calcHits.added, 1
+
+            dn2.multiplied = 777
+            equal dn2.multiplied, 777
+            equal dn2.multiplied, 777
+            equal dn2.calcHits.multiplied, 1
+
         describe "clearing cached property value & recalculate 'em:", ->
 
           it "clears cached properties by name & recalculates them on demand", ->
+
             deepEqual dn.cleanProps('added'), ['added']
 
             dn.x = 6; dn.y = 3
@@ -218,8 +256,8 @@ describe "CCP:", ->
             equal dn.calcHits.added, 2
 
             equal dn.calcHits.multiplied, 1
-            equal dn.multiplied, 12
-            equal dn.multiplied, 12
+            equal dn.multiplied, 555
+            equal dn.multiplied, 555
             equal dn.calcHits.multiplied, 1
 
           it "clears cached property values by name or function, ignoring undefined", ->

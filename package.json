@@ -1,10 +1,10 @@
 {
   "name": "calculated-cached-properties",
-  "description": "calculated-cached-properties, a spinoff of uBerscore library. Docs will follow.",
-  "version": "0.0.4",
+  "description": "CalculatedCachedProperties allows properties to have values calculated by a function, and then cached. You can then manually invalidate the cache for one or more (or all) properties, forcing the function to invoked and recalculate next time the property is accessed. You can also set the value of property manually. Undefined / null etc are all valid property values. Works with POJSOs, JS constructors and CoffeeScript classes (i.e `MyClass extends CalculatedCachedProperties`). A spinoff from uBerscore library. Docs will follow, see the specs till then :-)",
+  "version": "0.1.0",
   "homepage": "https://github.com/anodynos/calculated-cached-properties",
   "author": {
-    "name": "Agelos Pikoulas",
+    "name": "Angelos Pikoulas",
     "email": "agelos.pikoulas@gmail.com"
   },
   "licenses": [
@@ -16,7 +16,12 @@
   "keywords": [
     "calculated",
     "cached",
-    "properties"
+    "cache",
+    "property",
+    "properties",
+    "objects",
+    "constructors",
+    "coffeescript class"
   ],
   "repository": {
     "type": "git",
@@ -26,20 +31,17 @@
     "url": "git://github.com/anodynos/calculated-cached-properties/issues",
     "email": "agelos.pikoulas@gmail.com"
   },
-  "main": "./build/dev/calculated-cached-properties-dev.js",
+  "main": "./build/dev/CalculatedCachedProperties.js",
   "scripts": {
     "test": "grunt release"
   },
   "engines": {
-    "node": ">=0.10"
-  },
-  "dependencies": {
-    "lodash": "*"
+    "node": ">=0.8"
   },
   "devDependencies": {
     "chai": "^1.9.2",
     "mocha": "1.x.x",
-    "coffee-script": "*",
+    "lodash": "*",
     "grunt": "0.4.5",
     "grunt-urequire": "0.7.x",
     "grunt-contrib-watch": "0.5.x",

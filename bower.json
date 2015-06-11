@@ -1,9 +1,10 @@
 {
   "name": "calculated-cached-properties",
-  "version": "0.0.4",
+  "description": "CalculatedCachedProperties allows properties to have values calculated by a function, and then cached. You can then manually invalidate the cache for one or more (or all) properties, forcing the function to invoked and recalculate next time the property is accessed. You can also set the value of property manually. Undefined / null etc are all valid property values. Works with POJSOs, JS constructors and CoffeeScript classes (i.e `MyClass extends CalculatedCachedProperties`). A spinoff from uBerscore library. Docs will follow, see the specs till then :-)",
+  "version": "0.1.0",
   "main": [
-    "build/dev/calculated-cached-properties.js",
-    "build/min/calculated-cached-properties-min.js"
+    "build/dev/CalculatedCachedProperties.js",
+    "build/min/CalculatedCachedProperties-min.js"
   ],
   "ignore": [
     "source",
@@ -11,19 +12,26 @@
     "node_modules",
     "bower_components",
     "source/spec/*.*",
-    "source/examples/*.*",
     "draft/*",
     "build/spec",
     ".gitignore",
     ".npmignore",
     "travis.yml"
   ],
-  "dependencies": {
-    "lodash": "*"
-  },
+  "keywords": [
+    "calculated",
+    "cached",
+    "cache",
+    "property",
+    "properties",
+    "objects",
+    "constructors",
+    "coffeescript class"
+  ],
   "devDependencies": {
     "chai": "*",
     "mocha": "*",
-    "uberscore": "~0.0.16"
+    "uberscore": "~0.0.16",
+    "lodash": "*"
   }
 }

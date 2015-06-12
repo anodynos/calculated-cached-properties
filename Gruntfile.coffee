@@ -27,7 +27,7 @@ module.exports = (grunt)->
         optimize: true # 'uglify2'
         resources: [
           [ '+remove:debug', [/./]
-            (m)-> m.replaceCode c for c in ['l.deb()', 'if (l.deb()){}' ]]
+            (m)-> m.replaceCode c for c in ['l.deb()', 'l.log()' ]]
 
           [ '%save with different name', ['CalculatedCachedProperties.js' ],
            (m)->

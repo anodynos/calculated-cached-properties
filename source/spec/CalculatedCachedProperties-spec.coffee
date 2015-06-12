@@ -115,9 +115,16 @@ describe "CalculatedCachedProperties:", ->
     it "calulated property has the correct value", ->
       equal obj.someCalcProperty, calcValue
 
-    it.skip "object instance is correctly identified as such", ->
-      tru _.isPlainObject obj       # fails
-      tru obj.constructor is Object # fails
+    describe "object instance is correctly identified as: ", ->
+
+      it "_B.isHash", ->
+        tru _B.isHash obj
+
+      it.skip "_.isPlainObject", ->
+        tru _.isPlainObject obj       # fails
+
+      it.skip "obj.constructor is Object", ->
+        tru obj.constructor is Object # fails
 
   describe "calculating & caching properties:", ->
 

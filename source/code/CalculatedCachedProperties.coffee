@@ -15,7 +15,7 @@ class CalculatedCachedProperties
   cUndefined = {'cUndefined':true} # allow undefined as a valid cached value - store this instead of deleting key
 
   # register simple pojsos or constructor functions
-  @register: (pojsoOrConstructor, calcProperties)->
+  @register: (pojsoOrConstructor, calcProperties, isOverwrite)->
     if _.isFunction pojsoOrConstructor
       classConstructor = pojsoOrConstructor
       _.extend classConstructor.prototype, CalculatedCachedProperties.prototype
@@ -30,7 +30,7 @@ class CalculatedCachedProperties
       _.extend ctor.prototype, CalculatedCachedProperties.prototype
       _.extend (ctor.calcProperties or= {}), calcProperties
 
-      pojso.defineCalcProperties()
+      pojso.defineCalcProperties(isOverwrite)
 
     pojsoOrConstructor
 
@@ -93,7 +93,7 @@ class CalculatedCachedProperties
   # and initializes each property value to `cUndefined`
   ###
   initCache: ->
-    l.deb "Initializing cache for calculated properties of constructor named `#{@constructor.name}`"
+    l.deb "CalculatedCachedProperties: Initializing cache for calculated properties of constructor named `#{@constructor.name}`"
 
     # TODO: check if exists & just reset ?
     Object.defineProperty @, cacheKey, value: {}, enumerable: true, configurable: false, writeable: false
@@ -108,20 +108,21 @@ class CalculatedCachedProperties
       if not @constructor::hasOwnProperty(cPropName) or isOverwrite
         do (cPropName, cPropFn)=>
 
-          l.deb "...defining calculated property #{@constructor.name}.#{cPropName}"
+          l.deb "CalculatedCachedProperties: DEFINE calculated property #{@constructor.name}.#{cPropName}"
           Object.defineProperty @constructor::, cPropName, # @todo: allow instance properties to be added dynamically
             enumerable: true
             configurable: true # @todo: check if its not same class and redefine ?
             get:->
               @initCache() if not @[cacheKey] # make sure it runs on the instance
-              l.deb "...requesting calculated property #{@constructor.name}.#{cPropName}"
+              l.deb "CalculatedCachedProperties: GET value of calculated property #{@constructor.name}.#{cPropName}"
               if @[cacheKey][cPropName] is cUndefined
-                l.deb "...refreshing calculated property #{@constructor.name}.#{cPropName}" # and cPropName isnt 'dstFilenames'
+                l.deb "CalculatedCachedProperties: CALCULATING & CACHING property #{@constructor.name}.#{cPropName}"
                 @[cacheKey][cPropName] = cPropFn.call @
               @[cacheKey][cPropName]
 
             set: (v)->
               @initCache() if not @[cacheKey] # make sure it runs on the instance
+              l.deb "CalculatedCachedProperties: SET value of property #{@constructor.name}.#{cPropName}"
               @[cacheKey][cPropName] = v
     null
 
@@ -136,12 +137,12 @@ class CalculatedCachedProperties
         propKeys = _.keys(@allCalcProperties or @getAllCalcProperties()) if not propKeys # `propKeys or=` can't be assigned with ||= because it has not been declared before
         for p in propKeys when ca(p)
           if @[cacheKey][p] isnt cUndefined
-            l.deb "...delete (via fn) value of property #{@constructor.name}.#{p}"
+            l.deb "CalculatedCachedProperties: CLEAR (via function) value of property #{@constructor.name}.#{p}"
             @[cacheKey][p] = cUndefined
             cleaned.push p
       else # should be string-able
         if @[cacheKey][ca] isnt cUndefined
-          l.deb "...delete value of property #{@constructor.name}.#{ca}"
+          l.deb "CalculatedCachedProperties: CLEAR value of property #{@constructor.name}.#{ca}"
           @[cacheKey][ca] = cUndefined
           cleaned.push ca
     cleaned

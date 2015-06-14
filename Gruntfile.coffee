@@ -7,7 +7,6 @@ module.exports = (grunt)->
           shim: true
         template: banner: true
         clean: true
-#        debugLevel: 10
 
       _defaults: # for lib
         main: 'CalculatedCachedProperties'
@@ -20,14 +19,18 @@ module.exports = (grunt)->
 
       dev:
         dstPath: 'build/dev'
-        resources: [[ '+add:Logger', [/./], (m)-> m.beforeBody = "var l = console; l.deb = l.log" ]]
 
       min:
         dstPath: 'build/min'
-        optimize: true # 'uglify2'
+        optimize: true # 'uglify2': output: { beautify: true, compress: false, mangle: false }
+
         resources: [
-          [ '+remove:debug', [/./]
-            (m)-> m.replaceCode c for c in ['l.deb()', 'l.log()' ]]
+          [ '+remove:debug', [/./],
+            (m)-> m.replaceCode c for c in [
+              'if (_this.constructor.isDebug()){}'
+              'if (this.constructor.isDebug()){}'
+            ]
+          ]
 
           [ '%save with different name', ['CalculatedCachedProperties.js' ],
            (m)->
@@ -66,9 +69,9 @@ module.exports = (grunt)->
       specWatch:
         derive: ['spec']
         afterBuild: [[null], require('urequire-ab-specrunner').options
-          mochaOptions: '-R dot'
-          specRunners: ['mocha-cli']
+          specRunners: [ 'mocha-cli' ]
           watch: true
+          #mochaOptions: '-R dot'
         ]
 
   splitTasks = (tasks)-> if (tasks instanceof Array) then tasks else tasks.split(/\s/).filter((f)->!!f)

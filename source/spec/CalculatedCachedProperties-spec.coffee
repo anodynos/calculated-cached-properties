@@ -4,13 +4,13 @@ describe "CalculatedCachedProperties:", ->
 
   class SelfishNumber extends CalculatedCachedProperties2
     constructor: ->
-      super
+      super {isOverwrite: true}
       @setNums.apply @, arguments
 
     setNums: (@x, @y)->
       @calcHits = {}
 
-    @calcProperties =
+    @CCP_calcProperties =
       doubled: ->
         @calcHits.doubled = (@calcHits.doubled or 0) + 1
         if @x < 1000
@@ -22,7 +22,7 @@ describe "CalculatedCachedProperties:", ->
 
   class DirtyNumbers extends SelfishNumber
 
-    @calcProperties =
+    @CCP_calcProperties =
       added: ->
         @calcHits.added = (@calcHits.added or 0) + 1
         @x + @y
@@ -32,66 +32,70 @@ describe "CalculatedCachedProperties:", ->
         @x * @y
 
   allDnProperties =
-    doubled: SelfishNumber.calcProperties.doubled
-    added: DirtyNumbers.calcProperties.added # overriden
-    multiplied: DirtyNumbers.calcProperties.multiplied
+    doubled: SelfishNumber.CCP_calcProperties.doubled
+    added: DirtyNumbers.CCP_calcProperties.added # overriden
+    multiplied: DirtyNumbers.CCP_calcProperties.multiplied
 
-  describe "Get classes & calcProperties of inherited classes", ->
+  describe "CalculatedCachedProperties has a VERSION.", ->
+    it "It is not empty:", ->
+      fals _.isEmpty CalculatedCachedProperties.VERSION
+
+  describe "Get classes & CCP_calcProperties of inherited classes", ->
     dn = new DirtyNumbers
     sn = new SelfishNumber
 
     describe "called on target instance:", ->
-      it "#1", ->
-        deepEqual dn.classes, [CalculatedCachedProperties, CalculatedCachedProperties2, SelfishNumber, DirtyNumbers ]
+      it "instance #1", ->
+        deepEqual dn.CCP_classes, [CalculatedCachedProperties, CalculatedCachedProperties2, SelfishNumber, DirtyNumbers ]
 
-      it "#2", ->
-        deepEqual sn.classes, [CalculatedCachedProperties, CalculatedCachedProperties2, SelfishNumber]
+      it "instance #2", ->
+        deepEqual sn.CCP_classes, [CalculatedCachedProperties, CalculatedCachedProperties2, SelfishNumber]
 
     describe "Get all calculated properties, overriding properties in parent classes:", ->
 
       describe "without params:", ->
         describe "called on instance:", ->
-          it "#1", ->
-            deepEqual dn.getAllCalcProperties(), allDnProperties
-            deepEqual dn.allCalcProperties, allDnProperties
+          it "instance #1", ->
+            deepEqual dn.CCP_getAllCalcProperties(), allDnProperties
+            deepEqual dn.CCP_allCalcProperties, allDnProperties
 
-          it "#2", ->
-            deepEqual sn.getAllCalcProperties(), SelfishNumber.calcProperties
-            deepEqual sn.allCalcProperties, SelfishNumber.calcProperties
+          it "instance #2", ->
+            deepEqual sn.CCP_getAllCalcProperties(), SelfishNumber.CCP_calcProperties
+            deepEqual sn.CCP_allCalcProperties, SelfishNumber.CCP_calcProperties
 
         describe "called statically:", ->
-          it "#1", -> deepEqual DirtyNumbers.getAllCalcProperties(), allDnProperties
-          it "#2", -> deepEqual SelfishNumber.getAllCalcProperties(), SelfishNumber.calcProperties
+          it "instance #1", -> deepEqual DirtyNumbers.CCP_getAllCalcProperties(), allDnProperties
+          it "instance #2", -> deepEqual SelfishNumber.CCP_getAllCalcProperties(), SelfishNumber.CCP_calcProperties
 
       describe "with instance as param:", ->
 
         describe "called on (any) instance:", ->
-          it "#1", -> deepEqual sn.getAllCalcProperties(dn), allDnProperties
-          it "#2", -> deepEqual dn.getAllCalcProperties(sn), SelfishNumber.calcProperties
+          it "instance #1", -> deepEqual sn.CCP_getAllCalcProperties(dn), allDnProperties
+          it "instance #2", -> deepEqual dn.CCP_getAllCalcProperties(sn), SelfishNumber.CCP_calcProperties
 
         describe "called statically (on any class):", ->
-          it "#1", ->
-            deepEqual DirtyNumbers.getAllCalcProperties(dn), allDnProperties
-            deepEqual SelfishNumber.getAllCalcProperties(dn), allDnProperties
-            deepEqual CalculatedCachedProperties.getAllCalcProperties(dn), allDnProperties
-          it "#2", ->
-            deepEqual DirtyNumbers.getAllCalcProperties(sn), SelfishNumber.calcProperties
-            deepEqual SelfishNumber.getAllCalcProperties(sn), SelfishNumber.calcProperties
-            deepEqual CalculatedCachedProperties.getAllCalcProperties(sn), SelfishNumber.calcProperties
+          it "instance #1", ->
+            deepEqual DirtyNumbers.CCP_getAllCalcProperties(dn), allDnProperties
+            deepEqual SelfishNumber.CCP_getAllCalcProperties(dn), allDnProperties
+            deepEqual CalculatedCachedProperties.CCP_getAllCalcProperties(dn), allDnProperties
+          it "instance #2", ->
+            deepEqual DirtyNumbers.CCP_getAllCalcProperties(sn), SelfishNumber.CCP_calcProperties
+            deepEqual SelfishNumber.CCP_getAllCalcProperties(sn), SelfishNumber.CCP_calcProperties
+            deepEqual CalculatedCachedProperties.CCP_getAllCalcProperties(sn), SelfishNumber.CCP_calcProperties
 
       describe "with class as param:", ->
 
         describe "called on (any) instance:", ->
-          it "#1", -> deepEqual sn.getAllCalcProperties(DirtyNumbers), allDnProperties
-          it "#2", -> deepEqual dn.getAllCalcProperties(SelfishNumber), SelfishNumber.calcProperties
+          it "instance #1", -> deepEqual sn.CCP_getAllCalcProperties(DirtyNumbers), allDnProperties
+          it "instance #2", -> deepEqual dn.CCP_getAllCalcProperties(SelfishNumber), SelfishNumber.CCP_calcProperties
 
       describe "called statically (on any class):", ->
-        it "#1", ->
-          deepEqual CalculatedCachedProperties.getAllCalcProperties(DirtyNumbers), allDnProperties
-          deepEqual SelfishNumber.getAllCalcProperties(DirtyNumbers), allDnProperties
-        it "#2", ->
-          deepEqual CalculatedCachedProperties.getAllCalcProperties(SelfishNumber), SelfishNumber.calcProperties
-          deepEqual DirtyNumbers.getAllCalcProperties(SelfishNumber), SelfishNumber.calcProperties
+        it "instance #1", ->
+          deepEqual CalculatedCachedProperties.CCP_getAllCalcProperties(DirtyNumbers), allDnProperties
+          deepEqual SelfishNumber.CCP_getAllCalcProperties(DirtyNumbers), allDnProperties
+        it "instance #2", ->
+          deepEqual CalculatedCachedProperties.CCP_getAllCalcProperties(SelfishNumber), SelfishNumber.CCP_calcProperties
+          deepEqual DirtyNumbers.CCP_getAllCalcProperties(SelfishNumber), SelfishNumber.CCP_calcProperties
 
   describe "POJSO's prototype registering:", ->
     ObjectDotPrototype = _.clone Object.prototype, true
@@ -172,9 +176,9 @@ describe "CalculatedCachedProperties:", ->
       {title, dn, dn2, dn3} = dirtyNums
       do (dn, dn2, dn3)->
 
-        describe "calculates calcProperties once: for `#{title}`: ", ->
+        describe "calculates CCP_calcProperties once: for `#{title}`: ", ->
 
-          it "#1", ->
+          it "instance #1", ->
             equal dn.doubled, 6
             equal dn.doubled, 6
             equal dn.calcHits.doubled, 1
@@ -187,7 +191,7 @@ describe "CalculatedCachedProperties:", ->
             equal dn.multiplied, 12
             equal dn.calcHits.multiplied, 1
 
-          it "#2", ->
+          it "instance #2", ->
             equal dn2.doubled, 10
             equal dn2.doubled, 10
             equal dn2.calcHits.doubled, 1
@@ -202,7 +206,7 @@ describe "CalculatedCachedProperties:", ->
 
         describe "remembers cached result, without calculating", ->
 
-          it "#1", ->
+          it "instance #1", ->
             dn.x = 55; dn.y = 44;
             equal dn.added, 7
             equal dn.added, 7
@@ -212,7 +216,7 @@ describe "CalculatedCachedProperties:", ->
             equal dn.multiplied, 12
             equal dn.calcHits.multiplied, 1
 
-          it "#2", ->
+          it "instance #2", ->
             dn2.x = 22; dn2.y = 33;
             equal dn2.added, 11
             equal dn2.added, 11
@@ -224,7 +228,7 @@ describe "CalculatedCachedProperties:", ->
 
         describe "setting value of property manually becomes the cached result", ->
 
-          it "#1", ->
+          it "instance #1", ->
             dn.added = 333
             equal dn.added, 333
             equal dn.added, 333
@@ -235,7 +239,7 @@ describe "CalculatedCachedProperties:", ->
             equal dn.multiplied, 555
             equal dn.calcHits.multiplied, 1
 
-          it "#2", ->
+          it "instance #2", ->
             dn2.added = 444
             equal dn2.added, 444
             equal dn2.added, 444
@@ -250,7 +254,7 @@ describe "CalculatedCachedProperties:", ->
 
           it "clears cached properties by name & recalculates them on demand", ->
 
-            deepEqual dn.cleanProps('added'), ['added']
+            deepEqual dn.CCP_clean('added'), ['added']
 
             dn.x = 6; dn.y = 3
             equal dn.calcHits.added, 1
@@ -270,7 +274,7 @@ describe "CalculatedCachedProperties:", ->
           it "clears cached property values by name or function, ignoring undefined", ->
             dn.x = 6; dn.y = 4
             deepEqual(
-              dn.cleanProps(undefined, 'doubled', undefined, ((nme)-> nme is 'multiplied'), undefined)
+              dn.CCP_clean(undefined, 'doubled', undefined, ((nme)-> nme is 'multiplied'), undefined)
               , ['doubled', 'multiplied'])
 
             # cleared, recalculating once
@@ -294,7 +298,7 @@ describe "CalculatedCachedProperties:", ->
           describe "clears all cached property values, recalculates them all on demand", ->
 
             it "clears all cached property values", ->
-              deepEqual dn.cleanProps(), ['doubled', 'added', 'multiplied']
+              deepEqual dn.CCP_clean(), ['doubled', 'added', 'multiplied']
 
             it "clearing forces recaclulation of inherited property value", ->
               dn.setNums 4, 7
@@ -330,7 +334,7 @@ describe "CalculatedCachedProperties:", ->
             equal dn3.doubled, undefined
             equal dn3.calcHits.doubled, 1
 
-            deepEqual dn3.cleanProps('doubled'), ['doubled']
+            deepEqual dn3.CCP_clean('doubled'), ['doubled']
             dn3.setNums 5
             equal dn3.calcHits.doubled, undefined
             equal dn3.doubled, 10

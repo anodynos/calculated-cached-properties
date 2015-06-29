@@ -22,7 +22,7 @@ module.exports = (grunt)->
 
       min:
         dstPath: 'build/min'
-        optimize: true # 'uglify2': output: { beautify: true, compress: false, mangle: false }
+        optimize: 'uglify2' #: output: {beautify: true}, compress: false, mangle: false
 
         resources: [
           [ '+remove:debug', [/./],

@@ -162,15 +162,20 @@ class CalculatedCachedProperties
       if _.isFunction ca
         propKeys = _.keys(@CCP_allCalcProperties or @CCP_getAllCalcProperties()) if not propKeys # `propKeys or=` can't be assigned with ||= because it has not been declared before
         for p in propKeys when ca(p)
-          if @[cacheKey][p] isnt cUndefined
-            if @constructor.isDebug(60)
-              console.log "CalculatedCachedProperties: CLEAN (via function) value of property #{@constructor.name or 'UNNAMED'}.#{p}"
+          if @constructor.isDebug(60)
+            console.log "CalculatedCachedProperties: CLEAN (via function) value of property #{@constructor.name or 'UNNAMED'}.#{p}"
+          if not @[cacheKey]
+            @_CCP_initCache() # init cache sets all to cUndefined
+          else
             @[cacheKey][p] = cUndefined
-            cleaned.push p
+          cleaned.push p
       else # should be string-able
         if @constructor.isDebug(60)
           console.log "CalculatedCachedProperties: CLEAN value of property #{@constructor.name or 'UNNAMED'}.#{ca}"
-        @[cacheKey][ca] = cUndefined
+        if not @[cacheKey]
+          @_CCP_initCache() # init cache sets all to cUndefined
+        else
+          @[cacheKey][ca] = cUndefined
         cleaned.push ca
 
     return cleaned # return names of cleaned props

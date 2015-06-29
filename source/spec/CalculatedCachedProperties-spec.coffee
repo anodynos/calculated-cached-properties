@@ -176,6 +176,12 @@ describe "CalculatedCachedProperties:", ->
       {title, dn, dn2, dn3} = dirtyNums
       do (dn, dn2, dn3)->
 
+        describe "Can clean properties before they are even used : for `#{title}`: ", ->
+          deepEqual dn.CCP_clean('doubled'), ['doubled']
+
+        describe "Can clean properties that dont even exist: for `#{title}`: ", ->
+          deepEqual dn.CCP_clean('NOT_EXISTENT'), ['NOT_EXISTENT']
+
         describe "calculates CCP_calcProperties once: for `#{title}`: ", ->
 
           it "instance #1", ->

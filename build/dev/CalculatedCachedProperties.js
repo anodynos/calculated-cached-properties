@@ -2,7 +2,7 @@
 * calculated-cached-properties https://github.com/anodynos/calculated-cached-properties
 *
 * CalculatedCachedProperties allows properties to have values calculated by a function, and then cached. You can then manually invalidate (clean) the cache for one or more (or all) properties, forcing the function to be invoked and recalculate next time the property is accessed. You can also set the value of a property manually. Undefined / null etc are all valid property values. Works with POJSOs, JS constructors and CoffeeScript classes (i.e `MyClass extends CalculatedCachedProperties`, and then just call `super` constructor). A spinoff from uBerscore library. Docs will follow, see the specs till then :-)
-* Version 0.2.1 - Compiled on 2015-06-29 16:05:41
+* Version 0.2.1 - Compiled on 2015-07-17 08:54:59
 * Repository git://github.com/anodynos/calculated-cached-properties
 * Copyright(c) 2015 Angelos Pikoulas <agelos.pikoulas@gmail.com>
 * License MIT http://www.opensource.org/licenses/mit-license.php
@@ -157,7 +157,7 @@ CalculatedCachedProperties = function () {
     }
   });
   function CalculatedCachedProperties(options) {
-    this._CCP_defineCalcProperties(options);
+    this._CCP_defineCalcProperties(options || {});
   }
   CalculatedCachedProperties.prototype._CCP_initCache = function () {
     var cPropFn, cPropName, _ref;

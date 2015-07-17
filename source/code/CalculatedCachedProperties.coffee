@@ -95,7 +95,7 @@ class CalculatedCachedProperties
       @constructor::_classes
 
   # TODO: how to pass options from subclasses 
-  constructor: (options)-> @_CCP_defineCalcProperties options
+  constructor: (options)-> @_CCP_defineCalcProperties options or {}
 
   ###
   # Creates the cache {} held in `cacheKey` as a non enumerable field (i.e hidden)

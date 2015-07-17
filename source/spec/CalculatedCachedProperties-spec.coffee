@@ -40,6 +40,10 @@ describe "CalculatedCachedProperties:", ->
     it "It is not empty:", ->
       fals _.isEmpty CalculatedCachedProperties.VERSION
 
+  describe "a class without constructor", ->
+    it "can be instantiated", ->
+      ok new CalculatedCachedProperties2
+
   describe "Get classes & CCP_calcProperties of inherited classes", ->
     dn = new DirtyNumbers
     sn = new SelfishNumber

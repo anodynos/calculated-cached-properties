@@ -2,7 +2,7 @@
 * calculated-cached-properties https://github.com/anodynos/calculated-cached-properties
 *
 * CalculatedCachedProperties allows properties to have values calculated by a function, and then cached. You can then manually invalidate (clean) the cache for one or more (or all) properties, forcing the function to be invoked and recalculate next time the property is accessed. You can also set the value of a property manually. Undefined / null etc are all valid property values. Works with POJSOs, JS constructors and CoffeeScript classes (i.e `MyClass extends CalculatedCachedProperties`, and then just call `super` constructor). A spinoff from uBerscore library. Docs will follow, see the specs till then :-)
-* Version 0.2.1 - Compiled on 2015-07-17 08:54:59
+* Version 0.2.2 - Compiled on 2015-07-17 10:44:53
 * Repository git://github.com/anodynos/calculated-cached-properties
 * Copyright(c) 2015 Angelos Pikoulas <agelos.pikoulas@gmail.com>
 * License MIT http://www.opensource.org/licenses/mit-license.php
@@ -33,7 +33,7 @@ rootExport(window, factory(_require, _exports, _module));;
 }).call(this, function (require, exports, module) {
   
 
-var VERSION = '0.2.1'; // injected by urequire-rc-inject-version
+var VERSION = '0.2.2'; // injected by urequire-rc-inject-version
 
 var CalculatedCachedProperties, _, __slice = [].slice;
 _ = {
@@ -156,8 +156,10 @@ CalculatedCachedProperties = function () {
       }
     }
   });
-  function CalculatedCachedProperties(options) {
-    this._CCP_defineCalcProperties(options || {});
+  function CalculatedCachedProperties() {
+    var args, _ref;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    this._CCP_defineCalcProperties((_ref = args[args.length - 1]) != null ? _ref.CCP_options : void 0);
   }
   CalculatedCachedProperties.prototype._CCP_initCache = function () {
     var cPropFn, cPropName, _ref;
@@ -178,6 +180,9 @@ CalculatedCachedProperties = function () {
   };
   CalculatedCachedProperties.prototype._CCP_defineCalcProperties = function (options) {
     var cPropFn, cPropName, _ref;
+    if (options == null) {
+      options = {};
+    }
     this.constructor.isDebug = function (lev) {
       return options.debugLevel >= lev;
     };
@@ -236,6 +241,9 @@ CalculatedCachedProperties = function () {
   CalculatedCachedProperties.prototype.CCP_clean = function () {
     var ca, cleanArgs, cleaned, p, propKeys, _i, _j, _len, _len1;
     cleanArgs = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    if (!_.isFunction(this.constructor.isDebug)) {
+      this._CCP_defineCalcProperties();
+    }
     if (cleanArgs.length === 0) {
       cleanArgs = _.keys(this.CCP_allCalcProperties || this.CCP_getAllCalcProperties());
     }

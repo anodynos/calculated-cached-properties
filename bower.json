@@ -1,7 +1,7 @@
 {
   "name": "calculated-cached-properties",
   "description": "CalculatedCachedProperties allows properties to have values calculated by a function, and then cached. You can then manually invalidate (clean) the cache for one or more (or all) properties, forcing the function to be invoked and recalculate next time the property is accessed. You can also set the value of a property manually. Undefined / null etc are all valid property values. Works with POJSOs, JS constructors and CoffeeScript classes (i.e `MyClass extends CalculatedCachedProperties`, and then just call `super` constructor). A spinoff from uBerscore library. Docs will follow, see the specs till then :-)",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "main": [
     "build/dev/CalculatedCachedProperties.js",
     "build/min/CalculatedCachedProperties-min.js"
